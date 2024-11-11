@@ -2,10 +2,19 @@ package com.karkera.demoscalerfakestoreapi.services;
 
 import com.karkera.demoscalerfakestoreapi.configs.RestTemplatesConfig;
 import com.karkera.demoscalerfakestoreapi.dtos.FakeStoreProductDto;
+import com.karkera.demoscalerfakestoreapi.exceptions.ProductNotFoundException;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RequestCallback;
+import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
 import com.karkera.demoscalerfakestoreapi.models.Product;
 import com.karkera.demoscalerfakestoreapi.models.Category;
+
+import javax.management.InstanceNotFoundException;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Service
 public class FakeStoreProductService implements ProductService{
@@ -15,9 +24,12 @@ public class FakeStoreProductService implements ProductService{
     }
 
     @Override
-    public Product getProductById(Long id) {
+    public Product getProductById(Long id) throws ProductNotFoundException {
         FakeStoreProductDto fakeStoreProductDto = restTemplate.getForObject("https://fakestoreapi.com/products/" + id,
                 FakeStoreProductDto.class);
+        if(fakeStoreProductDto == null) {
+            throw new ProductNotFoundException(id, "Product not found for id: " + id);
+        }
         return convertFakeStoreProductDtoToProduct(fakeStoreProductDto);
     }
 
@@ -38,5 +50,33 @@ public class FakeStoreProductService implements ProductService{
         product.setCategory(category);
 
         return product;
+    }
+
+    public Iterable<Product> getAllProducts() {
+        FakeStoreProductDto[] fakeStoreProductDtos = restTemplate.getForObject("https://fakestoreapi.com/products",
+                FakeStoreProductDto[].class);
+        assert fakeStoreProductDtos != null;
+        return Arrays.stream(fakeStoreProductDtos)
+                .map(this::convertFakeStoreProductDtoToProduct)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Product updateProduct(Long id,Product product) {
+        FakeStoreProductDto fakeStoreProductDto = new FakeStoreProductDto();
+        fakeStoreProductDto.setId(product.getId());
+        fakeStoreProductDto.setTitle(product.getTitle());
+        fakeStoreProductDto.setDescription(product.getDesc());
+        fakeStoreProductDto.setPrice(product.getPrice());
+        fakeStoreProductDto.setImage(product.getImage());
+        fakeStoreProductDto.setCategory(product.getCategory().getTitle());
+
+        RequestCallback requestCallback = restTemplate.httpEntityCallback(fakeStoreProductDto, FakeStoreProductDto.class);
+
+        ResponseExtractor<ResponseEntity<FakeStoreProductDto>> responseExtractor = restTemplate.responseEntityExtractor(FakeStoreProductDto.class);
+        FakeStoreProductDto reponseFakeStoreProductDto = restTemplate.execute("https://fakestoreapi.com/products/" + id,
+                HttpMethod.PUT, requestCallback, responseExtractor).getBody();
+
+        return convertFakeStoreProductDtoToProduct(reponseFakeStoreProductDto);
     }
 }

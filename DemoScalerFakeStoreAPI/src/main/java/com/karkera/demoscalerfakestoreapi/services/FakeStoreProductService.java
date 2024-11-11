@@ -1,6 +1,5 @@
 package com.karkera.demoscalerfakestoreapi.services;
 
-import com.karkera.demoscalerfakestoreapi.configs.RestTemplatesConfig;
 import com.karkera.demoscalerfakestoreapi.dtos.FakeStoreProductDto;
 import com.karkera.demoscalerfakestoreapi.exceptions.ProductNotFoundException;
 import org.springframework.http.HttpMethod;
@@ -12,7 +11,6 @@ import org.springframework.web.client.RestTemplate;
 import com.karkera.demoscalerfakestoreapi.models.Product;
 import com.karkera.demoscalerfakestoreapi.models.Category;
 
-import javax.management.InstanceNotFoundException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -41,7 +39,7 @@ public class FakeStoreProductService implements ProductService{
         Product product = new Product();
         product.setId(fakeStoreProductDto.getId());
         product.setTitle(fakeStoreProductDto.getTitle());
-        product.setDesc(fakeStoreProductDto.getDescription());
+        product.setDescription(fakeStoreProductDto.getDescription());
         product.setPrice(fakeStoreProductDto.getPrice());
         product.setImage(fakeStoreProductDto.getImage());
 
@@ -66,7 +64,7 @@ public class FakeStoreProductService implements ProductService{
         FakeStoreProductDto fakeStoreProductDto = new FakeStoreProductDto();
         fakeStoreProductDto.setId(product.getId());
         fakeStoreProductDto.setTitle(product.getTitle());
-        fakeStoreProductDto.setDescription(product.getDesc());
+        fakeStoreProductDto.setDescription(product.getDescription());
         fakeStoreProductDto.setPrice(product.getPrice());
         fakeStoreProductDto.setImage(product.getImage());
         fakeStoreProductDto.setCategory(product.getCategory().getTitle());

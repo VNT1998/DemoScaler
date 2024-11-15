@@ -60,7 +60,7 @@ public class FakeStoreProductService implements ProductService{
     }
 
     @Override
-    public Product updateProduct(Long id,Product product) {
+    public Product replaceProduct(Long id,Product product) {
         FakeStoreProductDto fakeStoreProductDto = new FakeStoreProductDto();
         fakeStoreProductDto.setId(product.getId());
         fakeStoreProductDto.setTitle(product.getTitle());
@@ -76,5 +76,10 @@ public class FakeStoreProductService implements ProductService{
                 HttpMethod.PUT, requestCallback, responseExtractor).getBody();
 
         return convertFakeStoreProductDtoToProduct(reponseFakeStoreProductDto);
+    }
+
+    @Override
+    public Product createProduct(Product product) {
+        return null;
     }
 }

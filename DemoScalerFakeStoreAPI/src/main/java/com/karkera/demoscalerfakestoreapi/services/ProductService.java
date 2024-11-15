@@ -11,5 +11,7 @@ public interface ProductService {
 
     public Iterable<Product> getAllProducts();
 
-    public Product updateProduct(Long id, Product product);
+    Product replaceProduct(Long id, Product product);
+
+    Product createProduct(Product product);
 }
